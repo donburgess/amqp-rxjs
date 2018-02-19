@@ -11,37 +11,39 @@ export class AMQP {
     private _client: amqplib.Channel;
     private _clients: {[key: string]: amqplib.Channel} = {};
     private _rpcEvents: EventEmitter;
-    private readonly _defaultConsumeOpts;
-    private readonly _defaultAssertOpts;
+    private readonly _defaultConsumeOpts: amqplib.Options.Consume;
+    private readonly _defaultAssertOpts: amqplib.Options.AssertQueue;
 
     constructor(private readonly _config: amqplib.Options.Connect, coOpts: amqplib.Options.Consume = {}, chOpts: amqplib.Options.AssertQueue = {}) {
         this._defaultConsumeOpts = coOpts;
         this._defaultAssertOpts = chOpts;
     }
 
-    public connectAutoRetry(attempt = 0): Observable<amqplib.Channel> {
-        return this.closeConnection()
+    public connectAutoRetry(attempt = 0): Observable<string> {
+        // return this.closeConnection()
+        return Observable.of({})
             .switchMap(() => Observable
                 .fromPromise(amqplib.connect(this._config))
                 .catch(() => Observable.interval(10000).take(1).switchMap(() => this.connectAutoRetry(++attempt)))
                 .switchMap((connection: amqplib.Connection) => {
                     this._connection = connection;
                     return this.createChannel(DEFAULT).map((channel) => {
-                        this._client = channel;
+                        this._client = this.getChannel(DEFAULT)
                         return channel;
                     });
                 })
             );
     }
 
-    public connect(): Observable<amqplib.Channel> {
-        return this.closeConnection()
+    public connect(): Observable<string> {
+        // return this.closeConnection()
+        return Observable.of({})
             .switchMap(() => Observable
                 .fromPromise(amqplib.connect(this._config))
                 .switchMap((connection: amqplib.Connection) => {
                     this._connection = connection;
                     return this.createChannel(DEFAULT).map((channel) => {
-                        this._client = channel;
+                        this._client = this.getChannel(DEFAULT)
                         return channel;
                     });
                 })
@@ -84,12 +86,13 @@ export class AMQP {
         }
     }
 
-    public listenRPC(queueName: string, procedure: (msg: any, callback: (response: any, error?: Error) => void) => void, channel = this._client): Observable<amqplib.Replies.Consume> {
+    public listenRPC(queueName: string, procedure: (msg: any, callback: (response: any, error?: Error) => void) => void, queueOptions = this._defaultAssertOpts, channel = this._client): Observable<amqplib.Replies.Consume> {
         if (!channel) {
             return Observable.throw(new Error('An open channel is required to consume messages.'));
         }
 
-        return Observable.fromPromise(
+        return Observable.concat(
+            channel.assertQueue(queueName, queueOptions),
             channel.consume(
                 queueName,
                 (msg: amqplib.Message) => {
@@ -123,7 +126,8 @@ export class AMQP {
 
                     channel.ack(msg);
                 }
-            )
+            ),
+            (assert: amqplib.Replies.AssertQueue, consume: amqplib.Replies.Consume) => consume
         );
     }
 

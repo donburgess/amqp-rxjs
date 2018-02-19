@@ -3,16 +3,13 @@
         "noImplicitAny": true,
         "target": "es6",
         "module": "commonjs",
-        "outDir": "./lib",
+        "outDir": "./",
         "declaration": true,
         "removeComments": true,
         "emitDecoratorMetadata": true,
         "experimentalDecorators": true,
         "sourceMap": true
     },
-    "include": [
-        "src"
-    ],
     "exclude": [
         "node_modules"
     ]
