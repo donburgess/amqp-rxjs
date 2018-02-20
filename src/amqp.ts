@@ -14,7 +14,7 @@ export class AMQP {
     private readonly _defaultConsumeOpts: amqplib.Options.Consume;
     private readonly _defaultAssertOpts: amqplib.Options.AssertQueue;
 
-    constructor(private readonly _config: amqplib.Options.Connect, coOpts: amqplib.Options.Consume = {noAck: true}, chOpts: amqplib.Options.AssertQueue = {}) {
+    constructor(private readonly _config: amqplib.Options.Connect, chOpts: amqplib.Options.AssertQueue = {}, coOpts: amqplib.Options.Consume = {noAck: true}) {
         this._defaultConsumeOpts = coOpts;
         this._defaultAssertOpts = chOpts;
     }

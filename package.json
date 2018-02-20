@@ -2,10 +2,13 @@
   "name": "@db3dev/amqp-rxjs",
   "version": "1.0.1",
   "description": "A rxjs wrapper for amqplib",
+  "repository": { 
+    "type" : "git",
+    "url" : "https://github.com/db3dev/amqp-rxjs.git"
+  },
   "main": "./lib/amqp.js",
   "types": "./lib/amqp.d.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "compile": "tsc --declaration"
   },
   "author": "Don Burgess <don@db3dev.com>",
