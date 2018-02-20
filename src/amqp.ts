@@ -21,10 +21,14 @@ export class AMQP {
 
     public connectAutoRetry(attempt = 0): Observable<string> {
         // return this.closeConnection()
+        console.log('AMQP Connection Attempt: ${attempt}');
         return Observable.of({})
             .switchMap(() => Observable
                 .fromPromise(amqplib.connect(this._config))
-                .catch(() => Observable.interval(10000).take(1).switchMap(() => this.connectAutoRetry(++attempt)))
+                .catch(() => Observable.interval(10000).take(1).switchMap(() => {
+                    console.log('AMQP Connection Attempt Failed.')
+                    return this.connectAutoRetry(++attempt)
+                }))
                 .switchMap((connection: amqplib.Connection) => {
                     this._connection = connection;
                     return this.createChannel(DEFAULT).map((channel) => {
