@@ -1,5 +1,6 @@
 import * as amqplib from 'amqplib';
 import * as uuid from 'uuid';
+import * as dns from 'dns';
 import { Observable, ReplaySubject } from 'rxjs';
 import { EventEmitter } from 'events';
 
@@ -21,12 +22,12 @@ export class AMQP {
 
     public connectAutoRetry(attempt = 0): Observable<string> {
         // return this.closeConnection()
-        console.log('AMQP Connection Attempt: ${attempt}');
+        console.log(`AMQP Connection Attempt: ${attempt}`);
         return Observable.of({})
             .switchMap(() => Observable
                 .fromPromise(amqplib.connect(this._config))
                 .catch(() => Observable.interval(10000).take(1).switchMap(() => {
-                    console.log('AMQP Connection Attempt Failed.')
+                    console.log(`AMQP Connection Attempt Failed.`)
                     return this.connectAutoRetry(++attempt)
                 }))
                 .switchMap((connection: amqplib.Connection) => {
