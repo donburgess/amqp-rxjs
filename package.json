@@ -1,10 +1,10 @@
 {
   "name": "@db3dev/amqp-rxjs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A rxjs wrapper for amqplib",
-  "repository": { 
-    "type" : "git",
-    "url" : "https://github.com/db3dev/amqp-rxjs.git"
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/db3dev/amqp-rxjs.git"
   },
   "main": "./lib/amqp.js",
   "types": "./lib/amqp.d.ts",
