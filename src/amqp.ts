@@ -26,8 +26,8 @@ export class AMQP {
         return Observable.of({})
             .switchMap(() => Observable
                 .fromPromise(amqplib.connect(this._config))
-                .catch(() => Observable.interval(10000).take(1).switchMap(() => {
-                    console.log(`AMQP Connection Attempt Failed.`)
+                .catch((e: Error) => Observable.interval(10000).take(1).switchMap(() => {
+                    console.log(`AMQP Connection Attempt Failed: `, e.message)
                     return this.connectAutoRetry(++attempt)
                 }))
                 .switchMap((connection: amqplib.Connection) => {
